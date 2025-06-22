@@ -11,11 +11,9 @@ def register():
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
-        # 自动生成RSA密钥对
-        keypair = generate_rsa_keypair()
-        public_key = keypair['public_key'] if isinstance(keypair, dict) else keypair[0]
+        public_key = data.get('public_key')
 
-        if not username or not password:
+        if not username or not password or not public_key:
             return jsonify({'msg': '缺少必要参数'}), 400
 
         if User.query.filter_by(username=username).first():

@@ -40,9 +40,11 @@ def manage_friends():
             exists = Friend.query.filter(and_(Friend.user_id==user.user_id, Friend.friend_id==friend.user_id)).first()
             if exists:
                 return jsonify({'message': '已添加为好友', 'data': []}), 200
-            # 添加好友关系
+            # 添加好友关系（双向）
             new_friend = Friend(user_id=user.user_id, friend_id=friend.user_id)
+            new_friend_reverse = Friend(user_id=friend.user_id, friend_id=user.user_id)
             db.session.add(new_friend)
+            db.session.add(new_friend_reverse)
             db.session.commit()
             friend_data = {'user_id': friend.user_id, 'username': friend.username, 'publicKey': friend.public_key}
             return jsonify({'message': f'添加好友 {friendName} 成功', 'data': [friend_data]}), 201

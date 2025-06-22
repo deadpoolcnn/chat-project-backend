@@ -60,7 +60,9 @@ def get_messages():
                 'encrypted_key': m.encrypted_key,
                 'iv': m.iv,
                 'ciphertext': m.ciphertext,
-                'signature': m.signature
+                'signature': m.signature,
+                'from_user_publicKey': User.query.filter_by(username=m.from_user).first().public_key if User.query.filter_by(username=m.from_user).first() else '',
+                'to_user_publicKey': User.query.filter_by(username=m.to_user).first().public_key if User.query.filter_by(username=m.to_user).first() else ''
             } for m in messages
         ]
         return jsonify({'message': '查询成功', 'data': data}), 200
