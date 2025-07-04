@@ -44,3 +44,13 @@ def login():
         return jsonify({'msg': '登录成功', 'user_id': user.user_id}), 200
     except Exception as e:
         return jsonify({'msg': '登录失败', 'error': str(e)}), 500
+
+@auth_bp.route('/getPublicKey', methods=['GET'])
+def get_public_key():
+    username = request.args.get('username')
+    if not username:
+        return jsonify({'msg': '缺少必要参数'}), 400
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'msg': '用户不存在'}), 404
+    return jsonify({'msg': '查询成功', 'public_key': user.public_key}), 200
