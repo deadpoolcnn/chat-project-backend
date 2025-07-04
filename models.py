@@ -8,7 +8,6 @@ class User(db.Model):
     username = db.Column(db.String(64), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     public_key = db.Column(db.Text, nullable=False)
-    # ... 其他字段 ...
 
 class Message(db.Model):
     msg_id = db.Column(db.String(64), primary_key=True)
@@ -19,4 +18,3 @@ class Message(db.Model):
     iv = db.Column(db.Text)
     ciphertext = db.Column(db.Text)
     signature = db.Column(db.Text)
-    # ... 其他字段 ...

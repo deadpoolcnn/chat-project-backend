@@ -16,16 +16,16 @@ def send_message():
         iv = data.get('iv')
         signature = data.get('signature')
         if not all([from_user, to_user, ciphertext, encrypted_key, iv, signature]):
-            return jsonify({'message': '缺少必要参数', 'data': []}), 400
-        # 检查用户是否存在
+            return jsonify({'message': 'Missing required parameters', 'data': []}), 400
+        # Check if users exist
         sender = User.query.filter_by(username=from_user).first()
         receiver = User.query.filter_by(username=to_user).first()
         if not sender or not receiver:
-            return jsonify({'message': '发送方或接收方不存在', 'data': []}), 404
+            return jsonify({'message': 'Sender or receiver not found', 'data': []}), 404
         msg = Message(
             msg_id=str(uuid.uuid4()),
-            from_user=from_user,  # 存用户名
-            to_user=to_user,      # 存用户名
+            from_user=from_user,  # store username
+            to_user=to_user,      # store username
             timestamp=datetime.utcnow(),
             encrypted_key=encrypted_key,
             iv=iv,
@@ -34,10 +34,10 @@ def send_message():
         )
         db.session.add(msg)
         db.session.commit()
-        return jsonify({'message': '消息发送成功', 'data': []}), 201
+        return jsonify({'message': 'Message sent successfully', 'data': []}), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({'message': '消息发送失败', 'data': [], 'error': str(e)}), 500
+        return jsonify({'message': 'Message sending failed', 'data': [], 'error': str(e)}), 500
 
 @messages_bp.route('/get_messages', methods=['GET'])
 def get_messages():
@@ -45,8 +45,8 @@ def get_messages():
         from_user = request.args.get('from_user')
         to_user = request.args.get('to_user')
         if not from_user or not to_user:
-            return jsonify({'message': '缺少必要参数', 'data': []}), 400
-        # 直接用用户名查找
+            return jsonify({'message': 'Missing required parameters', 'data': []}), 400
+        # Query by username
         messages = Message.query.filter(
             ((Message.from_user == from_user) & (Message.to_user == to_user)) |
             ((Message.from_user == to_user) & (Message.to_user == from_user))
@@ -54,8 +54,8 @@ def get_messages():
         data = [
             {
                 'msg_id': m.msg_id,
-                'from_user': m.from_user,  # 返回用户名
-                'to_user': m.to_user,      # 返回用户名
+                'from_user': m.from_user,
+                'to_user': m.to_user,
                 'timestamp': m.timestamp.isoformat(),
                 'encrypted_key': m.encrypted_key,
                 'iv': m.iv,
@@ -65,6 +65,6 @@ def get_messages():
                 'to_user_publicKey': User.query.filter_by(username=m.to_user).first().public_key if User.query.filter_by(username=m.to_user).first() else ''
             } for m in messages
         ]
-        return jsonify({'message': '查询成功', 'data': data}), 200
+        return jsonify({'message': 'Query successful', 'data': data}), 200
     except Exception as e:
-        return jsonify({'message': '查询失败', 'data': [], 'error': str(e)}), 500
+        return jsonify({'message': 'Query failed', 'data': [], 'error': str(e)}), 500
